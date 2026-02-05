@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Mission 3</title>
+    <link rel="stylesheet" href="custom.css">
+</head>
+<body>
+<div class="bar">
+    <h1>Rapport SAE</h1>
+
+
+
+    <nav class="nav">
+        <ul>
+            <li><a href="index.html"  >Accueil</a></li>
+            <li><a href="mission1.html">Mission 1</a></li>
+            <li><a href="mission2.html">Mission 2</a></li>
+            <li><a href="mission3.html">Mission 3</a></li>
+            <li><a href="conclusion.html">Conclusion</a></li>
+        </ul>
+    </nav>
+</div>
+<div class="con-box">
+    <h3>Contexte</h3>
+    <p>
+        l'objectif est de produire des requetes pertinentes pour l'entreprise Kdou
+    </p>
+</div>
+<div class="con-box">
+    <h3>Requete 1</h3>
+
+    <p>
+        <b><li>Enoncé:</b> </li>  Identifier les produits générant le plus de chiffre d'affaires et de volumes de vente pour optimiser l'approvisionnement et la stratégie commerciale de KDou.
+        <b><li>Construction:</b> </li> La requête joint les tables Produit et DetailCommande via RefProd. La fonction VAL() convertit QteParUnit (stocké en texte) en valeur numérique pour les calculs. Le GROUP BY sur NomProd agrège les données par produit. Le calcul du chiffre d'affaires (Quantite × QteParUnit) et le tri décroissant identifient les produits prioritaires pour l'optimisation stratégique de KDou.
+        <b><li> Code Sql:</b></li> </p>
+    <p>SELECT     P.NomProd,
+    COUNT(P.RefProd) AS NombreProduits,
+    SUM(DC.Quantite) AS QuantiteTotaleVendue,
+    ROUND(SUM(DC.Quantite * VAL(P.QteParUnit)), 2) AS ChiffreAffaires,
+    ROUND(AVG(VAL(P.QteParUnit)), 2) AS PrixMoyen </p>
+    <p>FROM      Produit AS P INNER JOIN DetailCommande AS DC ON P.RefProd = DC.RefProd </p>
+    <p>GROUP BY P.NomProd</p>
+    <p>ORDER BY SUM(DC.Quantite * VAL(P.QteParUnit)) DESC;</p>
+    <b><li> Résultat:</b></li>
+    <img src="images/requete 1.png" width="750" height="250">
+
+
+    </p>
+
+
+</div>
+<div class="con-box">
+    <h3>Requete 2</h3>
+
+    <p>
+        <b><li>Enoncé:</b> </li> Analyser les zones géographiques avec le plus de livraisons pour optimiser les tournées et réduire les distances parcourues par les livreurs.
+        <b><li>Construction:</b> </li> Jointure entre Client et Commande via CodeCli pour regrouper par zone géographique (CodePostal, Ville). Le COUNT DISTINCT compte les commandes et clients uniques par zone. Le champ Port représente les frais de livraison. HAVING filtre les zones avec au moins 5 commandes pour cibler les secteurs à potentiel d'optimisation logistique.
+        <b><li> Code Sql:</b></li></p>
+    <p>SELECT  C.CodePostal,
+    C.Ville,
+    COUNT(Co.NumCommande) AS NombreCommandes,
+    COUNT(C.CodeCli) AS NombreClients,
+    ROUND(AVG(Co.Port), 2) AS FraisMoyens</p>
+    <p>FROM  Clientele AS C
+        INNER JOIN Commande AS Co ON C.CodeCli = Co.CodeCli </p>
+    <p>GROUP BY
+        C.CodePostal,
+        C.Ville</p>
+    <p>HAVING
+        COUNT(Co.NumCommande) >= 5</p>
+    <p>ORDER BY
+        COUNT(Co.NumCommande) DESC;</p>
+    <b><li> Résultat:</b> </li>
+    <img src="images/requete 2.png"width="750">
+    </p>
+</div>
+<div class="con-box">
+    <h3>Requete 3</h3>
+
+    <p>
+        <b><li>Enoncé:</b> </li>  Identifier les produits en stock avec peu de ventes récentes pour décider de promotions, déstockage ou arrêt de référencement.
+        <b><li>Construction:</b> </li> Utilisation de LEFT JOIN pour inclure les produits sans vente. Le champ UnitesStock représente le stock disponible. La fonction DateAdd calcule les 6 derniers mois. Le ratio stock/ventes identifie les produits surstockés avec moins de 5 unités vendues et plus de 20 en stock, nécessitant une action commerciale urgente.
+        <b><li> Code Sql:</b></li> </p>
+    <p>SELECT P.RefProd,
+    P.NomProd,
+    P.UnitStock,
+    IIf(Sum(DC.Quantite) Is Null, 0, Sum(DC.Quantite)) AS QuantiteVendue,
+    Round(
+    P.UnitStock /
+    IIf(Sum(DC.Quantite) = 0 Or Sum(DC.Quantite) Is Null, 1, Sum(DC.Quantite)),
+    2
+    ) AS RatioStockVente</p>
+    <p>FROM Produit AS P
+        LEFT JOIN (DetailCommande AS DC
+        LEFT JOIN Commande AS C ON DC.NumCommande = C.NumCommande)
+        ON P.RefProd = DC.RefProd </p>
+    <p>WHERE (C.DateCde >= DateAdd("m", -6, Date()) OR C.DateCde Is Null)</p>
+    <p>HAVING IIf(Sum(DC.Quantite) Is Null, 0, Sum(DC.Quantite)) < 5 AND P.UnitStock > 20
+    </p>
+    <p>ORDER BY P.UnitStock DESC;
+    </p>
+    <b><li> Résultat:</b> </li>
+    <img src="images/requete 3.png"width="750">
+    </p>
+</div>
+<div class="con-box">
+    <h3>Requete 4</h3>
+
+    <p>
+        <b><li>Enoncé:</b> </li> Identifier les 10 clients qui ont généré le plus de chiffre d'affaires pour concentrer les efforts de fidélisation sur les clients les plus rentables.
+        <b><li>Construction:</b> </li> Requête simple avec jointure Client-Commande via CodeCli. Le GROUP BY agrège par client et compte leurs commandes. La somme du champ Port (frais de livraison) sert d'indicateur du volume d'activité. TOP 10 et ORDER BY DESC sélectionnent les 10 clients ayant généré le plus de frais de port, représentant les clients les plus actifs.
+        <b><li> Code Sql:</b></li> </p>
+    <p>SELECT  TOP 10
+    C.CodeCli,
+    C.Societe,
+    C.Ville,
+    COUNT(Co.NumCommande) AS NombreCommandes,
+    ROUND(SUM(Co.Port), 2) AS TotalPort</p>
+    <p>FROM Clientele AS C
+        INNER JOIN Commande AS Co ON C.CodeCli = Co.CodeCli</p>
+    <p>GROUP BY C.CodeCli, C.Societe, C.Ville
+    </p>
+    <p>ORDER BY SUM(Co.Port) DESC;</p>
+    <p>WHERE  Com1.NbCommandes = Com2.NbCommandes;</p>
+    <b><li> Résultat:</b> </li>
+    <img src="images/requete 4.png"width="750">
+    </p>
+</div>
+<div class="con-box">
+    <h3>Theme possible</h3>
+    <p> pour le liens entre le theme des desserts et des boissons en lien avec la santé on a calculer le chiffre d'affaire générer. On trouve  donc: </p>
+    <img src="images/R1.png"width="750">
+    <p>avec le code suivant:  SELECT
+        Year(C.DateCde) AS Annee,
+        CT.CodeCateg,
+        Sum(P.CoutAchat * DC.Quantité * (1 - DC.Remise_Pourcent / 100)) AS RevenuParAn
+        FROM
+        (Categorie AS CT
+        INNER JOIN Produit AS P ON CT.CodeCateg = P.CodeCateg)
+        INNER JOIN (Commande AS C
+        INNER JOIN DetailCommande AS DC ON C.Numcommande = DC.Numcommande)
+        ON P.refProd = DC.refProd
+        WHERE
+        CT.CodeCateg IN (1 ,3)
+        GROUP BY
+        Year(C.DateCde), CT.CodeCateg;
+    </p>
+    <p>  pour le theme offre de Kdou on cherche les produits non commandés actuellement . On trouve donc </p>
+    <img src="images/R2.png"width="750">
+    <p>avec le code suivant:  SELECT COUNT(*) AS ProduitCarnénoncommander
+        FROM ((Produit AS P
+        INNER JOIN Categorie AS C ON P.CodeCateg = C.CodeCateg)
+        LEFT JOIN DetailCommande AS DC ON P.RefProd = DC.RefProd)
+        WHERE C.NomCateg = "Viandes" AND DC.RefProd IS NULL;
+
+    </p>
+    <p>pour la provenances des produits on va calculer la chiffre d'affaire totale généré par les fournisseurs de hors UE.On trouve:</p>
+    <img src="images/R3.png"width="750">
+    <p>avec le code suivant:  SELECT Sum(P.CoutAchat * DC.Quantité * (1 - DC.Remise_Pourcent / 100)) AS CAhorsUE
+        FROM ((((Fournisseur AS F
+        INNER JOIN Produit AS P ON F.NoFour = P.NoFour)
+        INNER JOIN DetailCommande AS DC ON P.RefProd = DC.RefProd)
+        INNER JOIN Commande AS C ON DC.NumCommande = C.NumCommande)
+        INNER JOIN Pays AS PA ON F.NoPays = PA.NoPays)
+        WHERE
+        PA.PaysFR NOT IN (
+        "France", "Allemagne", "Belgique", "Espagne", "Italie", "Pays-Bas",
+        "Portugal", "Pologne", "Suède", "Autriche", "Danemark", "Irlande",
+        "Grèce", "Finlande", "Hongrie", "Tchéquie", "Slovaquie", "Roumanie",
+        "Bulgarie", "Croatie", "Slovénie", "Estonie", "Lettonie", "Lituanie",
+        "Luxembourg", "Malte", "Chypre"
+        );
+
+    </p>
+    <p> pour le partenariat on va chercher  des clients pilotes d'un reseau partenaire qui on autant  de commandes que les clients partenaires </p>
+    <img src="images/R4.png"width="750">
+    <p>avec le code suivant:  SELECT  C1.Contact AS Client, C1.CodeCliPart, C2.Contact AS Partenaire, Com1.NbCommandes AS NbCommandesClient, Com2.NbCommandes AS NbCommandesPartenaire
+        FROM ((Clientele AS C1 INNER JOIN Clientele AS C2
+        ON C1.CodeCliPart = C2.CodeCli)
+        LEFT JOIN (SELECT CodeCli, COUNT([NumCommande]) AS NbCommandes FROM Commande GROUP BY CodeCli)  AS Com1
+        ON C1.CodeCli = Com1.CodeCli)
+        LEFT JOIN (SELECT CodeCli, COUNT([NumCommande]) AS NbCommandes FROM Commande GROUP BY CodeCli)  AS Com2
+        ON C2.CodeCli = Com2.CodeCli
+        WHERE  Com1.NbCommandes = Com2.NbCommandes;
+
+    </p>
+</div>
+</body>
+</html>

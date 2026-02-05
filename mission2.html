@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Rapport SAE - KDou (Accueil)</title>
+    <link rel="stylesheet" href="custom.css">
+</head>
+<body>
+<div class="bar">
+    <h1>Rapport SAE</h1>
+
+
+
+    <nav class="nav">
+        <ul>
+            <li><a href="index.html"  >Accueil</a></li>
+            <li><a href="mission1.html">Mission 1</a></li>
+            <li><a href="mission2.html">Mission 2</a></li>
+            <li><a href="mission3.html">Mission 3</a></li>
+            <li><a href="conclusion.html">Conclusion</a></li>
+        </ul>
+    </nav>
+</div>
+<div class="con-box">
+    <h3>Contexte</h3>
+    <p>
+     le contexte est le meme que la mission 1  mais cette fois si sur une base de données nommée low code access
+    </p>
+</div>
+<div class="con-box">
+    <h3>Requete 1</h3>
+
+    <p>
+        <b><li>Enoncé/Interpretation:</b> </li> Pour optimiser les livraisons, on regarde quels couples de clients sont à Paris. Lister les
+        possibilités avec pour chacun Code, société et mail. Il faudra donc extraire tout les clients qui habitent à Paris et faire des couples de clients avec leurs code client, nom de société et l'adresse mail
+        <b><li> Résultat:</b></li>
+        <img src="images/2L.png" width="750" height="300">
+        <b><li> Code Sql:</b></li> </p>
+        <p>SELECT   C1.CodeCli AS CodeClient1, C1.Societe AS Societe1, C1.MailCli AS Mail1, C2.CodeCli AS CodeClient2, C2.Societe AS Societe2,  C2.MailCli AS Mail2</p>
+        <p>FROM  Clientele AS C1, Clientele AS C2</p>
+        <p>WHERE C1.Ville = "Paris" AND C2.Ville = "Paris" AND C1.CodeCli < C2.CodeCli</p>
+        <p>ORDER BY C1.CodeCli, C1.Societe,  C1.MailCli, C2.CodeCli, C2.Societe, C2.MailCli;</p>
+        <p>SELECT   C1.CodeCli AS CodeClient1, C1.Societe AS Societe1, C1.MailCli AS Mail1, C2.CodeCli AS CodeClient2, C2.Societe AS Societe2,  C2.MailCli AS Mail2</p>
+        <p> FROM  Clientele AS C1, Clientele AS C2</p>
+        <p>WHERE C1.Ville = "Paris" AND C2.Ville = "Paris" AND C1.CodeCli < C2.CodeCli</p>
+        <p>ORDER BY C1.CodeCli, C1.Societe,  C1.MailCli, C2.CodeCli, C2.Societe, C2.MailCli;</p>
+
+
+    </p>
+
+
+</div>
+<div class="con-box">
+    <h3>Requete 2</h3>
+
+    <p>
+        <b><li>Enoncé/Interpretation:</b> </li> On veut vérifier les coordonnées des clients parisiens : en donner une liste triée par
+        société. Il faudra donc extraire les coordonnees des clients qui habitent à Paris et faire et faire une liste triée par le nom des sociétés
+        <b><li> Résultat:</b> </li>
+        <img src="images/bb.png"width="750">
+        <b><li> Code Sql:</b></li> </p>
+    <p>SELECT *</p>
+    <p>FROM  Clientele</p>
+    <p>WHERE clientele.ville = "paris"</p>
+    <p>ORDER BY Societe ;</p>
+    </p>
+</div>
+
+</body>
+
+</html>
+
+
